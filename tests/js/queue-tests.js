@@ -8,158 +8,189 @@
  */
 "use strict";
 var fluid = require("infusion");
-fluid.loadTestingSupport();
+var jqUnit = require("node-jqunit");
 
 var gpii = fluid.registerNamespace("gpii");
 
 require("../../src/js/concurrent-promise-queue");
 
-fluid.defaults("gpii.tests.ul.imports.sequenceElements.pause", {
-    gradeNames: "fluid.test.sequenceElement",
-    sequence: [
-        {
-            func: "{testEnvironment}.pause"
-        },
-        {
-            event: "{testEnvironment}.events.pauseCompleted",
-            listener: "fluid.log",
-            args: ["Initial pause completed."]
-        }
-    ]
+jqUnit.asyncTest("The queue should succeed with a single literal value.", function () {
+    jqUnit.expect(2);
+    var queue = gpii.ul.imports.promiseQueue.createQueue(["plain old value"], 1);
+
+    jqUnit.start();
+    jqUnit.assertEquals("The queue should have resolved.", "resolve", queue.disposition);
+    jqUnit.stop();
+
+    queue.then(function (result) {
+        jqUnit.start();
+        jqUnit.assertDeepEq("The result should be as expected.", ["plain old value"], result);
+    }, jqUnit.fail);
 });
 
-fluid.defaults("gpii.tests.ul.imports.sequence", {
-    gradeNames: "fluid.test.sequence",
-    sequenceElements: {
-        startHarness: {
-            gradeNames: "gpii.tests.ul.imports.sequenceElements.pause",
-            priority:   "before:sequence"
+jqUnit.asyncTest("The queue should succeed with a single promise.", function () {
+    jqUnit.expect(2);
+    var succeededPromise = fluid.toPromise("it worked");
+    var queue = gpii.ul.imports.promiseQueue.createQueue([succeededPromise], 1);
+
+    jqUnit.start();
+    jqUnit.assertEquals("The queue should have resolved.", "resolve", queue.disposition);
+    jqUnit.stop();
+
+    queue.then(function (result) {
+        jqUnit.start();
+        jqUnit.assertDeepEq("The result should be as expected.", ["it worked"], result);
+    }, jqUnit.fail);
+});
+
+jqUnit.asyncTest("The queue should succeed with a promise-returning function.", function () {
+    jqUnit.expect(2);
+    var queue = gpii.ul.imports.promiseQueue.createQueue([function () { return fluid.toPromise("just fine"); }], 1);
+
+    jqUnit.start();
+    jqUnit.assertEquals("The queue should have resolved.", "resolve", queue.disposition);
+    jqUnit.stop();
+
+    queue.then(function (result) {
+        jqUnit.start();
+        jqUnit.assertDeepEq("The result should be as expected.", ["just fine"], result);
+    }, jqUnit.fail);
+});
+
+jqUnit.asyncTest("The queue should succeed with a mix of all three supported types.", function () {
+    jqUnit.expect(4);
+    var promise = fluid.toPromise("promise");
+    var promiseReturningFunction = function () { return fluid.toPromise("promise-returning function"); };
+    var value = "value";
+    var queue = gpii.ul.imports.promiseQueue.createQueue([promise, promiseReturningFunction(), value], 3);
+
+    jqUnit.start();
+    jqUnit.assertEquals("The queue should have resolved.", "resolve", queue.disposition);
+    jqUnit.stop();
+
+    queue.then(function (result) {
+        jqUnit.start();
+        jqUnit.assertTrue("The value should be in the results.", result.indexOf("value") !== -1);
+        jqUnit.assertTrue("The results of the promise should be in the results.", result.indexOf("promise") !== -1);
+        jqUnit.assertTrue("The results of the promise-returning function should be in the results.", result.indexOf("promise-returning function") !== -1);
+    }, jqUnit.fail);
+});
+
+jqUnit.asyncTest("A rejected promise should be handled correctly.", function () {
+    jqUnit.expect(2);
+    var promise = fluid.promise();
+    promise.reject("promise rejection details.");
+    var queue = gpii.ul.imports.promiseQueue.createQueue([promise], 1);
+
+    jqUnit.start();
+    jqUnit.assertEquals("The queue should have been rejected.", "reject", queue.disposition);
+    jqUnit.stop();
+
+    queue.then(
+        jqUnit.fail,
+        function (error) {
+            jqUnit.start();
+            jqUnit.assertEquals("The error should be as expected.", "promise rejection details.", error);
         }
+    );
+});
+
+jqUnit.asyncTest("A rejected promise returned by a function should be handled correctly.", function () {
+    jqUnit.expect(2);
+    var rejectedPromiseReturningFunction = function () {
+        var promise = fluid.promise();
+        promise.reject("promise rejection details.");
+        return promise;
+    };
+
+    var queue = gpii.ul.imports.promiseQueue.createQueue([rejectedPromiseReturningFunction], 1);
+
+    jqUnit.start();
+    jqUnit.assertEquals("The queue should have been rejected.", "reject", queue.disposition);
+    jqUnit.stop();
+
+    queue.then(
+        jqUnit.fail,
+        function (error) {
+            jqUnit.start();
+            jqUnit.assertEquals("The error should be as expected.", "promise rejection details.", error);
+        }
+    );
+});
+
+jqUnit.test("An error thrown in a function should be handled correctly.", function () {
+    jqUnit.expect(1);
+    var rejectedPromiseReturningFunction = function () {
+        throw "error details";
+    };
+
+    try {
+        gpii.ul.imports.promiseQueue.createQueue([rejectedPromiseReturningFunction], 1);
+    }
+    catch (error) {
+        jqUnit.assertEquals("The error should have been preserved.", "error details", error);
     }
 });
 
-fluid.defaults("gpii.tests.ul.imports.queue.caseHolder",{
-    gradeNames: ["fluid.test.testCaseHolder"],
-    inputs: {
-        resolveValue: "@expand:fluid.generate(10, true)"
-    },
-    modules: [{
-        name: "Concurrent promise queue tests.",
-        tests: [
-            {
-                name: "Testing promise queue bandwidth...",
-                type: "test",
-                sequenceGrade: "gpii.tests.ul.imports.sequence",
-                sequence: [{
-                    task: "gpii.tests.ul.imports.queue.caseHolder.generateBandwidthSequence",
-                    resolveFn: "jqUnit.assert",
-                    resolveArgs: ["The sequence should have completed..."]
-                }]
-            },
-            {
-                name: "Testing promise rejection handling...",
-                type: "test",
-                sequenceGrade: "gpii.tests.ul.imports.sequence",
-                sequence: [{
-                    task: "gpii.tests.ul.imports.queue.caseHolder.generateBandwidthSequence",
-                    rejectFn: "jqUnit.assertEquals",
-                    rejectArgs: ["The rejection should have been passed up the chain.", "Promise rejected.", "{arguments}.0"]
-                }]
-            },
-            {
-                name: "Testing overall `resolve` value for queue...",
-                type: "test",
-                sequenceGrade: "gpii.tests.ul.imports.sequence",
-                sequence: [{
-                    task: "gpii.tests.ul.imports.queue.caseHolder.generateResolveValueSequence",
-                    args: ["{that}.options.resolveValue"],
-                    resolveFn: "jqUnit.assertDeepEq",
-                    resolveArgs: ["The results should be visible when the queue resolves...", "{that}.options.resolveValue", "{arguments}.0"]
-                }]
-            }
-        ]
-    }]
+jqUnit.asyncTest("Multiple batches should run as expected.", function () {
+    var queue = gpii.ul.imports.promiseQueue.createQueue([0, 1, 1, 2, 3, 5], 3);
+
+    jqUnit.start();
+    jqUnit.assertEquals("The queue should have resolved.", "resolve", queue.disposition);
+    jqUnit.stop();
+
+    queue.then(function (results) {
+        jqUnit.start();
+        jqUnit.assertDeepEq("The results should be as expected.", [0, 1, 1, 2, 3, 5], results);
+    }, jqUnit.fail);
 });
 
-gpii.tests.ul.imports.queue.caseHolder.generateBandwidthSequence = function () {
-    var tokens = [0,1,2];
-    var input = fluid.generate(10, true);
+jqUnit.asyncTest("A single batch smaller than the batch size should run as expected.", function () {
+    var queue = gpii.ul.imports.promiseQueue.createQueue(["fee", "fi", "fo", "fum"], 10);
+
+    jqUnit.start();
+    jqUnit.assertEquals("The queue should have resolved.", "resolve", queue.disposition);
+    jqUnit.stop();
+
+    queue.then(function (results) {
+        jqUnit.start();
+        jqUnit.assertDeepEq("The results should be as expected.", ["fee", "fi", "fo", "fum"], results);
+    }, jqUnit.fail);
+});
+
+jqUnit.asyncTest("Load throttling should work as expected.", function () {
+    jqUnit.expect(1);
+    var tickets = 6;
     var promises = [];
-
-    fluid.each(input, function (value) {
-        promises.push(function () {
-            var promise = fluid.promise();
-
-            if (tokens.length) {
-                var myToken = tokens.pop();
-                setTimeout(function () {
-                    tokens.push(myToken);
-                    promise.resolve(value);
-                }, Math.random() * 100);
-            }
-            else {
-                promise.reject("Ran out of tokens!");
-            }
-
-            return promise;
-        });
-    });
-
-    var queue = gpii.ul.imports.promiseQueue.createQueue(promises, 3);
-    return queue;
-};
-
-gpii.tests.ul.imports.queue.caseHolder.generateRejectionSequence = function () {
-    var promises = [
-        function () {
-            var promise = fluid.promise();
-            promise.reject("Promise rejected.");
-            return promise;
-        }
-    ];
-
-    var queue = gpii.ul.imports.promiseQueue.createQueue(promises, 1);
-    return queue;
-};
-
-gpii.tests.ul.imports.queue.caseHolder.generateResolveValueSequence = function (input) {
-    var promises = [];
-
-    fluid.each(input, function (value) {
-        promises.push(function () {
-            var promise = fluid.promise();
-            setTimeout(function () { promise.resolve(value); }, Math.random() * 100);
-            return promise;
-        });
-    });
-
-    var queue = gpii.ul.imports.promiseQueue.createQueue(promises, 3);
-    return queue;
-};
-
-fluid.registerNamespace("gpii.tests.ul.imports.queue.environment");
-
-gpii.tests.ul.imports.queue.environment.pause = function (that) {
-    setTimeout(that.events.pauseCompleted.fire, that.options.pauseDuration);
-};
-
-fluid.defaults("gpii.tests.ul.imports.queue.environment", {
-    gradeNames: ["fluid.test.testEnvironment"],
-    pauseDuration: 25,
-    events: {
-        pauseCompleted: null
-    },
-    invokers: {
-        pause: {
-            funcName: "gpii.tests.ul.imports.queue.environment.pause",
-            args:     ["{that}"]
-        }
-    },
-    components: {
-        caseHolder: {
-            type: "gpii.tests.ul.imports.queue.caseHolder"
-        }
+    for (var a = 0; a < 10; a++) {
+        promises.push(gpii.ul.imports.tests.queue.generateTicketTakingFunction(tickets));
     }
-});
 
-fluid.test.runTests("gpii.tests.ul.imports.queue.environment");
+    var queue = gpii.ul.imports.promiseQueue.createQueue(promises, 5);
+
+    queue.then(function (results) {
+        jqUnit.start();
+        jqUnit.assertEquals("There should be the right number of results.", 10, results.length);
+    }, jqUnit.fail);});
+
+fluid.registerNamespace("gpii.ul.imports.tests.queue");
+
+gpii.ul.imports.tests.queue.generateTicketTakingFunction = function (tickets) {
+    var promise = fluid.promise();
+
+    if (tickets < 1) {
+        throw "no more tickets";
+    }
+    else {
+        promise.then(function () {
+            tickets++;
+        });
+
+        tickets--;
+    }
+
+    setTimeout(function () {
+        promise.resolve("Done");
+    }, 25);
+    return promise;
+};

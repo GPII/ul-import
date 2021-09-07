@@ -194,41 +194,48 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.handleMetadataWriteResponse = f
         that.promise.resolve();
     }
     else {
-        // Create the full path if it does not already exist.
-        mkdirp(dirPath).then(
-            function () {
-                // Adapted from: http://stackoverflow.com/questions/12740659/downloading-images-with-node-js
-                request(that.record.uri)
-                    .on("error", function (error) {
+        try {
+            // Create the full path if it does not already exist.
+            if (!fs.existsSync(dirPath)) {
+                // console.log("Trying to create " + dirPath);
+                mkdirp.sync(dirPath, {recursive: true});
+            }
+
+            var writeStream = fs.createWriteStream(filePath);
+
+            // Adapted from: http://stackoverflow.com/questions/12740659/downloading-images-with-node-js
+            request(that.record.uri)
+                .on("error", function (error) {
+                    // that.promise.reject(error);
+                    fluid.log(fluid.logLevel.TRACE, "Error downloading file:", error);
+                    that.promise.resolve();
+                })
+                .pipe(writeStream)
+                .on("close", function (error) {
+                    if (error) {
                         // that.promise.reject(error);
                         fluid.log(fluid.logLevel.TRACE, "Error downloading file:", error);
                         that.promise.resolve();
-                    })
-                    .pipe(fs.createWriteStream(filePath))
-                    .on("close", function (error) {
-                        if (error) {
-                            // that.promise.reject(error);
-                            fluid.log(fluid.logLevel.TRACE, "Error downloading file:", error);
-                            that.promise.resolve();
-                        }
-                        else {
-                            md5File(filePath, function (error, hash) {
-                                if (error) {
-                                    fluid.log(fluid.logLevel.WARN, "Error calculating MD5 checksum:", error);
-                                    that.promise.resolve();
-                                }
-                                else {
-                                    that.record.md5 = hash;
-                                    // TODO:  Confirm whether this is a duplicate up front, for now we handle this in a "curation" script.
-                                    fluid.log(fluid.logLevel.TRACE, "Saved image file for record '" +  that.record.image_id + "' to disk...");
-                                    that.promise.resolve();
-                                }
-                            });
-                        }
-                    });
-            },
-            that.promise.reject
-        );
+                    }
+                    else {
+                        md5File(filePath, function (error, hash) {
+                            if (error) {
+                                fluid.log(fluid.logLevel.WARN, "Error calculating MD5 checksum:", error);
+                                that.promise.resolve();
+                            }
+                            else {
+                                that.record.md5 = hash;
+                                // TODO:  Confirm whether this is a duplicate up front, for now we handle this in a "curation" script.
+                                fluid.log(fluid.logLevel.TRACE, "Saved image file for record '" +  that.record.image_id + "' to disk...");
+                                that.promise.resolve();
+                            }
+                        });
+                    }
+                });
+        }
+        catch (error) {
+            that.promise.reject(error);
+        }
     }
 };
 

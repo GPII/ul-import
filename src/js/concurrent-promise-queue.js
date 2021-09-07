@@ -40,53 +40,72 @@ fluid.registerNamespace("gpii.ul.imports.promiseQueue");
 gpii.ul.imports.promiseQueue.createQueue = function (promiseArray, promisesAtOnce) {
     var queuePromise = fluid.promise();
     var totalPromises = fluid.makeArray(promiseArray).length;
-    var resolutions = [];
 
-    var incomingPromiseQueue = fluid.copy(promiseArray);
-
-    for (var a = 0; a < Math.min(promisesAtOnce, totalPromises); a++) {
-        var singlePromise = incomingPromiseQueue.pop();
-        if (singlePromise) {
-            gpii.ul.imports.promiseQueue.wrapSinglePromise(singlePromise, queuePromise, incomingPromiseQueue, resolutions, totalPromises);
-        }
+    var batchPromises = [];
+    for (var a = 0; a < totalPromises; a += promisesAtOnce) {
+        var batchEnd = Math.min(totalPromises, a + promisesAtOnce);
+        batchPromises.push(gpii.ul.imports.promiseQueue.createBatchFunction(promiseArray, a, batchEnd));
     }
+
+    fluid.promise.sequence(batchPromises).then(
+        function (results) {
+            queuePromise.resolve(fluid.flatten(results));
+        },
+        queuePromise.reject
+    );
 
     return queuePromise;
 };
 
-gpii.ul.imports.promiseQueue.wrapSinglePromise = function (originalPromise, queuePromise, incomingPromiseQueue, resolutions, totalPromises) {
+/**
+ * Execute one "batch" of promises in a larger queue and ensure that:
+ *
+ * 1. The batch is flagged as complete when all promises resolve.
+ * 2. Any rejection ends execution after this batch.
+ *
+ * @param {Array} promisesArray - An array of `fluid.promise` objects, `fluid.promise`-returning functions, and/or values.
+ * @param {Integer} batchStart - The index of the start of the batch.
+ * @param {Integer} batchEnd - The index of the end of the batch.
+ * @return {Function} - A promise-returning function that can be used in the queue's `fluid.promise.sequence` call.
+ *
+ */
+gpii.ul.imports.promiseQueue.createBatchFunction = function (promisesArray, batchStart, batchEnd) {
+    return function () {
+        var batchPromise = fluid.promise();
+        var resolutions = [];
+        for (var a = batchStart; a < batchEnd; a++) {
+            var singlePromise = promisesArray[a];
+            gpii.ul.imports.promiseQueue.wrapSinglePromise(singlePromise, batchPromise, resolutions, batchEnd - batchStart);
+        }
+        return batchPromise;
+    };
+};
+
+gpii.ul.imports.promiseQueue.wrapSinglePromise = function (singlePromise, batchPromise, resolutions, batchSize) {
     var wrappedPromise = fluid.promise();
     wrappedPromise.then(function (singleResult) {
         resolutions.push(singleResult);
 
-        var singlePromise = incomingPromiseQueue.pop();
-        if (singlePromise) {
-            gpii.ul.imports.promiseQueue.wrapSinglePromise(singlePromise, queuePromise, incomingPromiseQueue, resolutions, totalPromises);
+        if (resolutions.length === batchSize) {
+            batchPromise.resolve(resolutions);
         }
-        else if (resolutions.length === totalPromises) {
-            queuePromise.resolve(resolutions);
-        }
-    }, queuePromise.reject);
+    }, batchPromise.reject);
 
-    if (fluid.isPromise(originalPromise)) {
-        fluid.fail("Error, you must use promise-returning functions rather than raw promises...");
+    if (fluid.isPromise(singlePromise)) {
+        fluid.promise.follow(singlePromise, wrappedPromise);
     }
-    else if (originalPromise instanceof Function) {
-        var promiseOrValue = originalPromise();
-        // We are dealing with a promise-returning function, wire it up to the wrapper's resolve and reject functions.
-        // See http://docs.fluidproject.org/infusion/development/PromisesAPI.html#fluid-ispromise-totest-
+    else if (singlePromise instanceof Function) {
+        var promiseOrValue = singlePromise();
         if (fluid.isPromise(promiseOrValue)) {
-            promiseOrValue.then(wrappedPromise.resolve, wrappedPromise.reject);
+            fluid.promise.follow(promiseOrValue, wrappedPromise);
         }
         // Assume this promise returns a simple value.
         else {
-            fluid.fail("Error, You must use promise-returning functions rather than value-returning functions...");
+            wrappedPromise.resolve(promiseOrValue);
         }
     }
     // Assume this promise consists of a simple value.
     else {
-        fluid.fail("Error, You must use promise-returning functions rather than raw values...");
+        wrappedPromise.resolve(singlePromise);
     }
-
-    return wrappedPromise;
 };
