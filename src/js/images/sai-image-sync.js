@@ -37,7 +37,7 @@
 */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogLevel(fluid.logLevel.FAIL);
+fluid.setLogLevel(fluid.logLevel.TRACE);
 
 var gpii = fluid.registerNamespace("gpii");
 
@@ -64,7 +64,7 @@ fluid.defaults("gpii.ul.imports.images.sai.transformImages", {
 
 gpii.ul.imports.images.sai.transformUri = function (originalUri) {
     // TODO: Make this more configurable as needed.
-    return originalUri.replace("public://", "http://staging.saa.gpii.net/sites/saa.gpii.net/files/");
+    return originalUri.replace("public://", "http://saa.gpii.net/sites/saa.gpii.net/files/");
 };
 
 fluid.defaults("gpii.ul.imports.images.sai.transformUri", {

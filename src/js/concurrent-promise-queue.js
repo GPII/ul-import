@@ -71,12 +71,16 @@ gpii.ul.imports.promiseQueue.createQueue = function (promiseArray, promisesAtOnc
  */
 gpii.ul.imports.promiseQueue.createBatchFunction = function (promisesArray, batchStart, batchEnd) {
     return function () {
+        // console.log("Creating batch " + batchStart + "-" + batchEnd);
         var batchPromise = fluid.promise();
         var resolutions = [];
         for (var a = batchStart; a < batchEnd; a++) {
             var singlePromise = promisesArray[a];
             gpii.ul.imports.promiseQueue.wrapSinglePromise(singlePromise, batchPromise, resolutions, batchEnd - batchStart);
         }
+        // batchPromise.then(function () {
+        //     console.log("Finished batch " + batchStart + "-" + batchEnd);
+        // });
         return batchPromise;
     };
 };

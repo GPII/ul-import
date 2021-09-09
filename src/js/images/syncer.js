@@ -26,66 +26,87 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.initAndStartSync = function (th
 
     that.jar = request.jar();
 
-    if (that.record.mime_type) {
-        gpii.ul.imports.images.syncer.singleRecordSyncer.updateImageId(that);
-    }
-    else {
-        // Get the HEAD information for the original image as a precursor to doing anything else.
-        request.head(that.record.uri, { timeout: 5000 }, function (error, response, body) {
-            if (error) {
-                fluid.log(fluid.logLevel.TRACE, "Error downloading image file:", error);
-                fluid.log(fluid.logLevel.TRACE, "Skipping record...");
-                that.promise.resolve();
-            }
-            else {
-                gpii.ul.imports.images.syncer.singleRecordSyncer.handleHeaderResponse(that, response, body);
-            }
-        });
-    }
+    // Always get the HEAD information for the original image as a precursor to doing anything else.
+    request.head(that.record.uri, { timeout: 5000 }, function (error, response, body) {
+        if (error) {
+            fluid.log(fluid.logLevel.TRACE, "Error downloading image file:", error);
+            fluid.log(fluid.logLevel.TRACE, "Skipping record...");
+            that.promise.resolve();
+        }
+        else {
+            gpii.ul.imports.images.syncer.singleRecordSyncer.handleHeaderResponse(that, response, body);
+        }
+    });
 };
 
 gpii.ul.imports.images.syncer.singleRecordSyncer.handleHeaderResponse = function (that, headerResponse) {
     var contentType = headerResponse.headers["content-type"];
+
     if (headerResponse.statusCode !== 200) {
         fluid.log(fluid.logLevel.TRACE, "Skipping image file that cannot be downloaded...");
         that.promise.resolve();
     }
-    else if (!gpii.ul.imports.images.extensions.extensionByMimeType[contentType]) {
-        // GARI does not send appropriate MIME information for its images, all are reported as "text/plain".  We have
-        // to make a second attempt to suss it out based on the Content-Disposition header, which is something like:
-        //
-        // Content-Disposition →attachment; filename=product-id2330-v1.jpg
+    else {
+        that.record.mime_type = contentType;
 
-        var contentDisposition = headerResponse.headers["content-disposition"];
-        if (contentDisposition) {
-            // https://xkcd.com/1171/
-            var matches = contentDisposition.match(/.+filename=(.+)/i);
-            if (matches) {
-                var extension = path.extname(matches[1]).substring(1).toLowerCase();
-                var mimeTypeFromExtension = fluid.keyForValue(gpii.ul.imports.images.extensions.extensionByMimeType, extension);
-                if (mimeTypeFromExtension) {
-                    that.record.mime_type = mimeTypeFromExtension;
-                    gpii.ul.imports.images.syncer.singleRecordSyncer.updateImageId(that);
+        if (!gpii.ul.imports.images.extensions.extensionByMimeType[contentType]) {
+            // GARI does not send appropriate MIME information for its images, all are reported as "text/plain".  We have
+            // to make a second attempt to suss it out based on the Content-Disposition header, which is something like:
+            //
+            // Content-Disposition →attachment; filename=product-id2330-v1.jpg
+
+            var contentDisposition = headerResponse.headers["content-disposition"];
+            if (contentDisposition) {
+                // https://xkcd.com/1171/
+                var matches = contentDisposition.match(/.+filename=(.+)/i);
+                if (matches) {
+                    var extension = path.extname(matches[1]).substring(1).toLowerCase();
+                    var mimeTypeFromExtension = fluid.keyForValue(gpii.ul.imports.images.extensions.extensionByMimeType, extension);
+                    if (mimeTypeFromExtension) {
+                        that.record.mime_type = mimeTypeFromExtension;
+                    }
+                    else {
+                        fluid.log(fluid.logLevel.TRACE, "Skipping image file with invalid mime type '" + contentType + "' (file extension '" + extension + "' cannot be handled)...");
+                        that.promise.resolve();
+                        return;
+                    }
                 }
                 else {
-                    fluid.log(fluid.logLevel.TRACE, "Skipping image file with invalid mime type '" + contentType + "' (file extension '" + extension + "' cannot be handled)...");
+                    fluid.log(fluid.logLevel.TRACE, "Skipping image file with invalid mime type '" + contentType + "' (secondary strategy could not determine filename)...");
                     that.promise.resolve();
+                    return;
                 }
             }
             else {
-                fluid.log(fluid.logLevel.TRACE, "Skipping image file with invalid mime type '" + contentType + "' (secondary strategy could not determine filename)...");
+                fluid.log(fluid.logLevel.TRACE, "Skipping image file with invalid mime type and no content-disposition headers...");
                 that.promise.resolve();
+                return;
             }
         }
-        else {
-            fluid.log(fluid.logLevel.TRACE, "Skipping image file with invalid mime type and no content-disposition headers...");
-            that.promise.resolve();
+
+        gpii.ul.imports.images.syncer.singleRecordSyncer.updateImageId(that);
+
+        var skipDownload = false;
+
+        var baseDir = fluid.module.resolvePath(that.options.imageDir);
+        var dirPath = path.resolve(baseDir, that.record.uid, that.record.source); // TODO: Change this to "sid" once we use the image API for writes.
+        var filePath = path.resolve(dirPath, that.record.image_id);
+
+        if (fs.existsSync(filePath)) {
+            var fsStats = fs.statSync(filePath);
+            if (fsStats.size === parseInt(headerResponse.headers["content-length"], 10)) {
+                skipDownload = true;
+            }
         }
 
-    }
-    else {
-        that.record.mime_type = contentType;
-        gpii.ul.imports.images.syncer.singleRecordSyncer.updateImageId(that);
+        if (skipDownload) {
+            fluid.log(fluid.logLevel.TRACE, "Existing file is the same size as what we have, skipping...");
+            that.promise.resolve();
+        }
+        else {
+            // This badly named function is the next step in the process once we know the MIME type.
+            gpii.ul.imports.images.syncer.singleRecordSyncer.login(that);
+        }
     }
 };
 
@@ -95,8 +116,6 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.updateImageId = function (that)
     if (that.record.image_id.indexOf(extension) === -1) {
         that.record.image_id += "." + extension;
     }
-
-    gpii.ul.imports.images.syncer.singleRecordSyncer.login(that);
 };
 
 gpii.ul.imports.images.syncer.singleRecordSyncer.login = function (that) {
@@ -126,6 +145,7 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.login = function (that) {
 gpii.ul.imports.images.syncer.singleRecordSyncer.readApiRecord = function (that) {
     // TODO: Update this to use the image API
     var key = encodeURIComponent(JSON.stringify([that.record.uid, that.record.source, that.record.image_id]));
+    fluid.log(fluid.logLevel.TRACE, "Reading API record for '" + key + "'.");
     var apiReadUrl = fluid.stringTemplate("%base/_design/metadata/_view/combined?key=%key", {
         base: that.options.urls.imageDb,
         key: key
@@ -159,6 +179,7 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.readApiRecord = function (that)
 
 // TODO: For new images, download the file to a temporary directory and then upload it to the image API.
 gpii.ul.imports.images.syncer.singleRecordSyncer.createRecord = function (that) {
+    fluid.log(fluid.logLevel.INFO, "Creating record for " + that.record.uid + ".");
     // Write the metadata record to the database directly.
     // TODO: Convert this to use the image API once the "write" portions are available.
     var options = {
@@ -183,59 +204,55 @@ gpii.ul.imports.images.syncer.singleRecordSyncer.createRecord = function (that) 
 };
 
 gpii.ul.imports.images.syncer.singleRecordSyncer.handleMetadataWriteResponse = function (that) {
+    fluid.log(fluid.logLevel.TRACE, "Handling metadata write response for " + that.record.uid + ".");
     // TODO: Convert this to use the image API once the "write" portions are available.
     // The path should be: :base/:source/:uid/:image_id
     var baseDir = fluid.module.resolvePath(that.options.imageDir);
     var dirPath = path.resolve(baseDir, that.record.uid, that.record.source); // TODO: Change this to "sid" once we use the image API for writes.
     var filePath = path.resolve(dirPath, that.record.image_id);
 
-    if (fs.existsSync(filePath)) {
-        fluid.log(fluid.logLevel.TRACE, "Image file already exists for record '" +  that.record.image_id + "', skipping download...");
-        that.promise.resolve();
-    }
-    else {
-        try {
-            // Create the full path if it does not already exist.
-            if (!fs.existsSync(dirPath)) {
-                // console.log("Trying to create " + dirPath);
-                mkdirp.sync(dirPath, {recursive: true});
-            }
+    try {
+        // Create the full path if it does not already exist.
+        if (!fs.existsSync(dirPath)) {
+            mkdirp.sync(dirPath);
+        }
 
-            var writeStream = fs.createWriteStream(filePath);
+        var writeStream = fs.createWriteStream(filePath);
 
-            // Adapted from: http://stackoverflow.com/questions/12740659/downloading-images-with-node-js
-            request(that.record.uri)
-                .on("error", function (error) {
+        // Adapted from: http://stackoverflow.com/questions/12740659/downloading-images-with-node-js
+        request(that.record.uri)
+            .on("error", function (error) {
+                // that.promise.reject(error);
+                fluid.log(fluid.logLevel.TRACE, "Error downloading file:", error);
+                that.promise.resolve();
+            })
+            .pipe(writeStream)
+            .on("close", function (error) {
+                // Always close the writestream.
+                writeStream.end();
+
+                if (error) {
                     // that.promise.reject(error);
                     fluid.log(fluid.logLevel.TRACE, "Error downloading file:", error);
                     that.promise.resolve();
-                })
-                .pipe(writeStream)
-                .on("close", function (error) {
-                    if (error) {
-                        // that.promise.reject(error);
-                        fluid.log(fluid.logLevel.TRACE, "Error downloading file:", error);
+                }
+                else {
+                    try {
+                        var hash  = md5File.sync(filePath);
+                        that.record.md5 = hash;
+                        // TODO:  Confirm whether this is a duplicate up front, for now we handle this in a "curation" script.
+                        fluid.log(fluid.logLevel.IMPORTANT, "Saved image file for record '" +  that.record.image_id + "' to disk...");
                         that.promise.resolve();
                     }
-                    else {
-                        md5File(filePath, function (error, hash) {
-                            if (error) {
-                                fluid.log(fluid.logLevel.WARN, "Error calculating MD5 checksum:", error);
-                                that.promise.resolve();
-                            }
-                            else {
-                                that.record.md5 = hash;
-                                // TODO:  Confirm whether this is a duplicate up front, for now we handle this in a "curation" script.
-                                fluid.log(fluid.logLevel.TRACE, "Saved image file for record '" +  that.record.image_id + "' to disk...");
-                                that.promise.resolve();
-                            }
-                        });
+                    catch (error) {
+                        fluid.log(fluid.logLevel.WARN, "Error calculating MD5 checksum:", error);
+                        that.promise.resolve();
                     }
-                });
-        }
-        catch (error) {
-            that.promise.reject(error);
-        }
+                }
+            });
+    }
+    catch (error) {
+        that.promise.reject(error);
     }
 };
 
@@ -288,6 +305,7 @@ gpii.ul.imports.images.syncer.startSync = function (that) {
 
 
     var queue = gpii.ul.imports.promiseQueue.createQueue(promises, that.options.maxRequests);
+    // var queue = fluid.promise.sequence(promises);
     queue.then(that.handleSuccess, that.handleError);
 };
 
@@ -297,6 +315,11 @@ gpii.ul.imports.images.syncer.handleSuccess = function (that, results) {
     if (that.skippedRecords) {
         fluid.log(fluid.stringTemplate(that.options.messages.skippedRecords, { length: that.skippedRecords}));
     }
+};
+
+gpii.ul.imports.images.syncer.handleError = function (that, error) {
+    var errorMessage = fluid.stringTemplate(that.options.messages.errorSavingRecords, error);
+    fluid.fail(errorMessage);
 };
 
 fluid.defaults("gpii.ul.imports.images.syncer", {
@@ -326,8 +349,8 @@ fluid.defaults("gpii.ul.imports.images.syncer", {
             args:     ["{that}", "{arguments}.0"]
         },
         handleError: {
-            funcName: "fluid.fail",
-            args:     ["{that}.options.messages.errorSavingRecords", "{arguments}.0"]
+            funcName: "gpii.ul.imports.images.syncer.handleError",
+            args:     ["{that}", "{arguments}.0"] // error
         }
     }
 });

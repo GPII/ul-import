@@ -5,7 +5,6 @@
  */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogLevel(fluid.logLevel.FAIL);
 
 var gpii  = fluid.registerNamespace("gpii");
 
@@ -74,9 +73,29 @@ gpii.ul.imports.images.core.startDownload = function (that) {
     });
 };
 
+gpii.ul.imports.images.core.sortRecords = function (recordA, recordB) {
+    if (recordA.uid === recordB.uid) {
+        if (recordA.source === recordB.source) {
+            return recordA.sid.localeCompare(recordB.sid);
+        }
+        else {
+            return recordA.source.localeCompare(recordB.source);
+        }
+    }
+    else {
+        return recordA.uid.localeCompare(recordB.uid);
+    }
+};
+
 gpii.ul.imports.images.core.saveImageRecords = function (that, imageRecordData) {
     var records = fluid.model.transformWithRules(imageRecordData, that.options.rules.extractImageRecords);
+    records.sort(gpii.ul.imports.images.core.sortRecords);
     that.transformer.applier.change("rawJson", records);
+};
+
+gpii.ul.imports.images.core.handleError = function (that, error) {
+    var errorMessage = fluid.stringTemplate(that.options.messages.errorLoadingImageData, error);
+    fluid.fail(errorMessage);
 };
 
 fluid.defaults("gpii.ul.imports.images.core", {
@@ -119,8 +138,8 @@ fluid.defaults("gpii.ul.imports.images.core", {
     },
     invokers: {
         handleError: {
-            funcName: "fluid.fail",
-            args: ["{that}.options.messages.errorLoadingImageData", "{arguments}.0"]
+            funcName: "gpii.ul.imports.images.core.handleError",
+            args: ["{that}", "{arguments}.0"] // error
         }
     }
 });

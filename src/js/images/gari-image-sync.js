@@ -34,7 +34,6 @@
  */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogLevel(fluid.logLevel.FAIL);
 
 var gpii = fluid.registerNamespace("gpii");
 

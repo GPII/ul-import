@@ -158,6 +158,7 @@ jqUnit.asyncTest("A single batch smaller than the batch size should run as expec
     }, jqUnit.fail);
 });
 
+// TODO: Need meaningful load throttling tests, these don't actually get near the limits.
 jqUnit.asyncTest("Load throttling should work as expected.", function () {
     jqUnit.expect(1);
     var tickets = 6;
@@ -190,7 +191,7 @@ gpii.ul.imports.tests.queue.generateTicketTakingFunction = function (tickets) {
     }
 
     setTimeout(function () {
-        promise.resolve("Done");
-    }, 25);
+        promise.resolve(fluid.copy(tickets));
+    }, Math.random() * 150);
     return promise;
 };

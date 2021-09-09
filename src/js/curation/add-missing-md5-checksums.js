@@ -5,7 +5,6 @@
  */
 "use strict";
 var fluid = require("infusion");
-fluid.setLogLevel(fluid.logLevel.FAIL);
 
 var gpii = fluid.registerNamespace("gpii");
 
@@ -53,17 +52,16 @@ gpii.ul.imports.curation.md5.handleIncompleteRecordResults = function (that, err
                 var promise = fluid.promise();
                 var pathSegments  = [ record.uid, record.source,  record.image_id ];
                 var filePath  = gpii.ul.api.images.file.resolvePath(that.options.originalsDir, pathSegments);
-                md5File(filePath, function (error, hash) {
-                    if (error) {
-                        fluid.log(fluid.logLevel.WARN, error);
-                        promise.resolve(record);
-                    }
-                    else {
-                        var updatedRecord = fluid.copy(record);
-                        updatedRecord.md5sum = hash;
-                        promise.resolve(updatedRecord);
-                    }
-                });
+                try {
+                    var hash = md5File.sync(filePath);
+                    var updatedRecord = fluid.copy(record);
+                    updatedRecord.md5sum = hash;
+                    promise.resolve(updatedRecord);
+                }
+                catch (error) {
+                    fluid.log(fluid.logLevel.WARN, error);
+                    promise.resolve(record);
+                }
 
                 return promise;
             });
