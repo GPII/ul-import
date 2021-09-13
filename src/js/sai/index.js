@@ -129,6 +129,7 @@ fluid.defaults("gpii.ul.imports.sai", {
                             }
                         }
                     },
+                    "sourceUrl": "sai_url",
                     "sourceData": ""
                 }
             }
