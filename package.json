@@ -22,6 +22,7 @@
         "curation-check-source-urls": "node src/js/curation/check-source-urls.js",
         "curation-fix-duplicate-children": "node src/js/curation/fix-duplicate-children.js",
         "curation-fix-duplicate-source-urls": "node src/js/curation/fix-duplicate-source-urls.js",
+        "curation-fix-missing-creation-date": "node src/js/curation/fix-missing-creation-date.js",
         "curation-invalid-records": "node src/js/curation/invalid-records.js",
         "curation-known-duplicates": "node src/js/curation/fix-known-duplicates.js",
         "curation-unified-orphans": "node src/js/curation/fix-orphaned-unified-records.js",

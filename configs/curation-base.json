@@ -34,6 +34,17 @@
                         }
                     ]
                 }
+            },
+            "missingCreated": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%ulDbBaseUrl/_design/reports/_view/missingcreated",
+                        {
+                            "ulDbBaseUrl": "{that}.options.urls.ulDb"
+                        }
+                    ]
+                }
             }
         }
     }
