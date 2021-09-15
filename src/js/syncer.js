@@ -138,7 +138,7 @@ gpii.ul.imports.syncer.getRecordUpdatePromise = function (that, updatedRecord, o
                 that.failedRecords.push(updatedRecord);
             }
             else if (response.statusCode === 200 || response.statusCode === 201) { // Updated
-                if (originalRecord && !gpii.ul.imports.filteredDeepEq(originalRecord, updatedRecord, that.options.diffFieldsToCompare)) {
+                if (originalRecord) {
                     that.preupdateOriginals.push(originalRecord);
                     that.updatedRecordCount++;
                     that.updatedRecords.push(updatedRecord);

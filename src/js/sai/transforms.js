@@ -31,3 +31,8 @@ gpii.ul.imports.sai.transformer.firstSaneValue = function (transformSpec, transf
 
     return fluid.transforms.firstValue(sanitizedTransformSpec, transformer);
 };
+
+gpii.ul.imports.sai.transformer.timeStampToDateString = function (timestampString) {
+    var date = new Date(parseInt(timestampString) * 1000);
+    return date.toISOString();
+};

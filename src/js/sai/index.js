@@ -130,6 +130,18 @@ fluid.defaults("gpii.ul.imports.sai", {
                         }
                     },
                     "sourceUrl": "sai_url",
+                    "created": {
+                        transform: {
+                            type: "gpii.ul.imports.sai.transformer.timeStampToDateString",
+                            inputPath: "created"
+                        }
+                    },
+                    "updated": {
+                        transform: {
+                            type: "gpii.ul.imports.sai.transformer.timeStampToDateString",
+                            inputPath: "last_updated"
+                        }
+                    },
                     "sourceData": ""
                 }
             }

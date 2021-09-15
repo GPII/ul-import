@@ -8,6 +8,11 @@ require("../helpers");
 
 fluid.registerNamespace("gpii.ul.imports.eastin.transformer");
 
+gpii.ul.imports.eastin.transformer.transformData = function (that, originalRecord) {
+    var transformedRecord = fluid.model.transformWithRules(originalRecord, that.options.mapRules);
+    return transformedRecord;
+};
+
 // Remap the data
 gpii.ul.imports.eastin.transformer.remapData = function (that) {
     var remappedJson = fluid.transform(that.model.rawJson, that.transformData);
@@ -44,6 +49,10 @@ gpii.ul.imports.eastin.transformer.standardizeIsoCode = function (code) {
 gpii.ul.imports.eastin.transformer.fixCasing = function (sourceName) {
     // In an exciting new variation, they actually changed the source name out from under us, we change it back to match our existing records.
     return sourceName.replace("DLF Data", "Dlf data");
+};
+
+gpii.ul.imports.eastin.transformer.standardizeDate = function (originalDateString) {
+    return new Date(originalDateString).toISOString();
 };
 
 fluid.defaults("gpii.ul.imports.eastin.transformer", {
@@ -169,9 +178,15 @@ fluid.defaults("gpii.ul.imports.eastin.transformer", {
                 }
             }
         },
+        created: {
+            transform: {
+                type: "gpii.ul.imports.eastin.transformer.standardizeDate",
+                inputPath: "InsertDate"
+            }
+        },
         updated: {
             transform: {
-                type: "fluid.transforms.dateToString",
+                type: "gpii.ul.imports.eastin.transformer.standardizeDate",
                 inputPath: "LastUpdateDate"
             }
         },
@@ -183,8 +198,8 @@ fluid.defaults("gpii.ul.imports.eastin.transformer", {
             args:     ["{that}"]
         },
         transformData: {
-            funcName: "fluid.model.transformWithRules",
-            args:     ["{arguments}.0", "{that}.options.mapRules"]
+            funcName: "gpii.ul.imports.eastin.transformer.transformData",
+            args:     ["{that}","{arguments}.0"]
         },
         lookupLanguage: {
             funcName: "gpii.ul.imports.eastin.transformer.lookupLanguage",

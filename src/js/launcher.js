@@ -32,6 +32,9 @@ fluid.defaults("gpii.ul.imports.launcher", {
         defaults: {
             "optionsFile": "{that}.options.optionsFile"
         },
+        coerce: {
+            "noCache": JSON.parse
+        },
         help: true
     }
 });
