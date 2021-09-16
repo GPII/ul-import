@@ -61,34 +61,36 @@ gpii.ul.imports.curation.fixMissingCreationDate.handleRecordsMissingCreationDate
     else {
         fluid.log(fluid.logLevel.IMPORTANT, body.rows.length, " child records found that are missing creation dates.");
 
-        if (body.rows.length && that.options.commit) {
-            var updatedRecords = [];
+        if (body.rows.length) {
+            if (that.options.commit) {
+                var updatedRecords = [];
 
-            fluid.each(body.rows, function (couchRecord) {
-                var existingRecord = couchRecord.value;
-                if (existingRecord.updated) {
-                    var updatedRecord = fluid.copy(existingRecord);
-                    updatedRecord.created = updatedRecord.updated;
-                    updatedRecords.push(updatedRecord);
+                fluid.each(body.rows, function (couchRecord) {
+                    var existingRecord = couchRecord.value;
+                    if (existingRecord.updated) {
+                        var updatedRecord = fluid.copy(existingRecord);
+                        updatedRecord.created = updatedRecord.updated;
+                        updatedRecords.push(updatedRecord);
+                    }
+                });
+
+                var bulkUpdatePromises = [];
+                for (var a = 0; a < body.rows.length; a += that.options.fixPerBulkUpdate) {
+                    var singleBulkUpdateRecords = updatedRecords.slice(a, a + that.options.fixPerBulkUpdate);
+                    bulkUpdatePromises.push(gpii.ul.imports.curation.fixMissingCreationDate.generateSingleBulkUpdateFunction(that, singleBulkUpdateRecords));
                 }
-            });
 
-            var bulkUpdatePromises = [];
-            for (var a = 0; a < body.rows.length; a += that.options.fixPerBulkUpdate) {
-                var singleBulkUpdateRecords = updatedRecords.slice(a, a + that.options.fixPerBulkUpdate);
-                bulkUpdatePromises.push(gpii.ul.imports.curation.fixMissingCreationDate.generateSingleBulkUpdateFunction(that, singleBulkUpdateRecords));
+                var sequence = fluid.promise.sequence(bulkUpdatePromises);
+                sequence.then(
+                    function () {
+                        fluid.log(fluid.logLevel.IMPORTANT, "Bulk updated all records.");
+                    },
+                    fluid.fail
+                );
             }
-
-            var sequence = fluid.promise.sequence(bulkUpdatePromises);
-            sequence.then(
-                function () {
-                    fluid.log(fluid.logLevel.IMPORTANT, "Bulk updated all records.");
-                },
-                fluid.fail
-            );
-        }
-        else {
-            fluid.log(fluid.logLevel.IMPORTANT, "Run with --commit to fix these records.");
+            else {
+                fluid.log(fluid.logLevel.IMPORTANT, "Run with --commit to fix these records.");
+            }
         }
     }
 };
