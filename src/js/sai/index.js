@@ -116,6 +116,12 @@ fluid.defaults("gpii.ul.imports.sai", {
                     "source": { literalValue: "sai" },
                     "sid": "nid",
                     "manufacturer": {
+                        "id": {
+                            transform: {
+                                type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
+                                values: [ "manufacturer.mfgr_id", { literalValue: "-1" } ]
+                            }
+                        },
                         "name": {
                             transform: {
                                 type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
@@ -126,6 +132,18 @@ fluid.defaults("gpii.ul.imports.sai", {
                             transform: {
                                 type: "gpii.ul.imports.transforms.stripNonValues",
                                 inputPath: "manufacturer.mfgr_country"
+                            }
+                        },
+                        "created": {
+                            transform: {
+                                type: "gpii.ul.imports.sai.transformer.timeStampToDateString",
+                                inputPath: "manufacturer.mfgr_added"
+                            }
+                        },
+                        "updated": {
+                            transform: {
+                                type: "gpii.ul.imports.sai.transformer.timeStampToDateString",
+                                inputPath: "manufacturer.mfgr_updated"
                             }
                         }
                     },
