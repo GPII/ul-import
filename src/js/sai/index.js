@@ -118,8 +118,8 @@ fluid.defaults("gpii.ul.imports.sai", {
                     "manufacturer": {
                         "id": {
                             transform: {
-                                type:   "gpii.ul.imports.sai.transformer.firstSaneValue",
-                                values: [ "manufacturer.mfgr_id", { literalValue: "-1" } ]
+                                type:   "gpii.ul.imports.sai.transformer.firstSaneNumberValue",
+                                values: [ "manufacturer.mfgr_nid", { literalValue: -1 } ]
                             }
                         },
                         "name": {

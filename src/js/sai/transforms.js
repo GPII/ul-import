@@ -32,6 +32,21 @@ gpii.ul.imports.sai.transformer.firstSaneValue = function (transformSpec, transf
     return fluid.transforms.firstValue(sanitizedTransformSpec, transformer);
 };
 
+fluid.defaults("gpii.ul.imports.sai.transformer.firstSaneNumberValue", {
+    gradeNames: "fluid.standardOutputTransformFunction"
+});
+
+gpii.ul.imports.sai.transformer.firstSaneNumberValue = function (transformSpec, transformer) {
+    var sanitizedTransformSpec = fluid.copy(transformSpec);
+
+    sanitizedTransformSpec.values = fluid.transform(sanitizedTransformSpec.values, function (value) {
+        var expanded = transformer.expand(value);
+        var numberValue = parseInt(expanded);
+        return isNaN(numberValue) ? "notfound" : { literalValue: numberValue };
+    });
+    return fluid.transforms.firstValue(sanitizedTransformSpec, transformer);
+};
+
 gpii.ul.imports.sai.transformer.timeStampToDateString = function (timestampString) {
     var date = new Date(parseInt(timestampString) * 1000);
     return date.toISOString();
