@@ -99,7 +99,7 @@ gpii.ul.imports.eastin.metadata.processRecordLookupResults = function (that, res
 
                 // Compare to the existing record and update if needed.
                 if (!fluid.diff.equals(combinedIsoCodes, unifiedRecord.isoCodes)) {
-                    var recordToUpdate = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), { status: "deleted" });
+                    var recordToUpdate = fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true);
                     recordToUpdate.isoCodes = combinedIsoCodes;
                     recordsToUpdate.push(recordToUpdate);
                 }
