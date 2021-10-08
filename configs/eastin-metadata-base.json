@@ -1,7 +1,7 @@
 {
     "options": {
         "gradeNames": [
-            "gpii.ul.imports.sai.metadata"
+            "gpii.ul.imports.eastin.metadata"
         ]
     }
 }

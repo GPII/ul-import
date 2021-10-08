@@ -1,6 +1,6 @@
 {
     "mergeConfigs": [
-        "%ul-imports/configs/sai-dev.json",
-        "%ul-imports/configs/sai-metadata-base.json"
+        "%ul-imports/configs/eastin-dev.json",
+        "%ul-imports/configs/eastin-metadata-base.json"
     ]
 }
