@@ -1,0 +1,9 @@
+{
+    "options": {
+        "username": "importer",
+        "password": "password",
+        "gradeNames": [
+            "gpii.ul.imports.gari.deleteAll"
+        ]
+    }
+}

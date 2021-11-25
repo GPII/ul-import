@@ -1,0 +1,6 @@
+{
+    "docs": [
+        { "name": "existing", "description": "existing record", "status": "active", "source": "~existing", "sid": "existing", "uid": "set", "manufacturer": { "name": "Acme Inc."} },
+        { "name": "slashes", "description": "existing record with slashes in its sid", "status": "active", "source": "~existing", "sid": "s/l/a/s/h", "manufacturer": { "name": "Acme Inc."} }
+    ]
+}

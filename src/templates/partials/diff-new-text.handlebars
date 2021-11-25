@@ -1,0 +1,6 @@
+{{#each . ~}}
+    {{~#if value}}
+        {{~#equals type "added"}}{{value}}{{/equals~}}
+        {{~#equals type "unchanged"}}{{value}}{{/equals~}}
+    {{~/if}}
+{{~/each}}

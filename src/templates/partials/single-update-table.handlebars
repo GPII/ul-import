@@ -1,0 +1,54 @@
+<table>
+    <caption>Summary of record changes since last version.</caption>
+    <tbody>
+    <tr>
+        <th scope="row">Source</th>
+        <td>{{>diff diff.source}}</td>
+    </tr>
+    <tr>
+        <th scope="row">SID</th>
+        <td>{{>diff diff.sid}}</td>
+    </tr>
+    {{#if diff.sourceUrl}}
+        <tr>
+            <th scope="row">Source URL</th>
+            <td>
+                {{>diff diff.sourceUrl}}<br/>
+                <a href="{{rightValue diff.sourceUrl}}" target="_blank">Open the latest source URL in a new window.</a>
+            </td>
+        </tr>
+    {{/if}}
+    <tr>
+        <th scope="row">Name</th>
+        <td>{{>diff diff.name}}</td>
+    </tr>
+    <tr>
+        <th scope="row">Description</th>
+        <td>
+            {{#hasChanged diff.description}}
+                {{>diff diff.description}}
+                <hr/>
+            {{/hasChanged}}
+            {{{md update.description}}}
+        </td>
+    </tr>
+    <tr>
+        <th scope="row">Manufacturer</th>
+        <td>
+            {{>manufacturer-diff diff.manufacturer}}
+        </td>
+    </tr>
+    <tr>
+        <th scope="row">Status</th>
+        <td>{{>diff diff.status}}</td>
+    </tr>
+    {{#if diff.uid}}
+        <tr>
+            <th>Unified Listing Entry</th>
+            <td>
+                <a href="https://ul.gpii.net/uid/{{rightValue diff.uid}}" target="_blank">{{rightValue diff.uid}}</a>
+            </td>
+        </tr>
+    {{/if}}
+    </tbody>
+</table>

@@ -1,0 +1,33 @@
+<table>
+    <tr>
+        <th>Name</th>
+        <td>{{>diff name}}</td>
+    </tr>
+    {{#if url}}
+        <tr>
+            <th>URL</th>
+            <td>
+                {{>diff url}}<br/>
+                <a href="{{>diff-new-text url}}" target="_blank">Open latest manufacturer URL in new window.</a>
+            </td>
+        </tr>
+    {{/if}}
+    {{#if email}}
+        <tr>
+            <th>Email Address</th>
+            <td>{{>diff email}}</td>
+        </tr>
+    {{/if}}
+    {{#if country}}
+        <tr>
+            <th>Country</th>
+            <td>{{>diff country}}</td>
+        </tr>
+    {{/if}}
+    {{#if cityTown}}
+        <tr>
+            <th>City/Town</th>
+            <td>{{>diff cityTown}}</td>
+        </tr>
+    {{/if}}
+</table>

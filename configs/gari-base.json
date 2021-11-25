@@ -1,0 +1,17 @@
+{
+    "type": "ul.imports.gari.baseConfig",
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.gari"
+        ],
+        "jobKey": "gari",
+        "sources": [
+            "GARI"
+        ],
+        "username": "importer",
+        "password": "password",
+        "urls": {
+            "gari": "http://mobileaccessibility.info/xml/mobile-accessibility-phones.xml"
+        }
+    }
+}

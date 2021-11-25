@@ -1,0 +1,8 @@
+{{#each . ~}}
+    {{~#if value}}
+        {{~#equals type "removed"}}{{>single-markdown-item-removed value}}{{/equals~}}
+        {{~#equals type "added"}}{{>single-markdown-item-added value}}{{/equals~}}
+        {{~#equals type "unchanged"}}{{{md value}}}{{/equals~}}
+    {{~/if}}
+{{~/each}}
+

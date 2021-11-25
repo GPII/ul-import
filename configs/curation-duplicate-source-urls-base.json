@@ -1,0 +1,12 @@
+{
+    "options": {
+        "username": "importer",
+        "password": "password",
+        "gradeNames": [
+            "gpii.ul.imports.curation.duplicateSourceUrls"
+        ]
+    },
+    "mergeConfigs": [
+        "%ul-imports/configs/curation-base.json"
+    ]
+}

@@ -1,0 +1,7 @@
+{
+    "type": "ul.imports.images.eastin.devConfig",
+    "mergeConfigs": [
+        "%ul-imports/configs/image-sync-dev.json",
+        "%ul-imports/configs/eastin-image-sync-base.json"
+    ]
+}

@@ -1,0 +1,31 @@
+<html lang="en">
+    <head>
+        <title>Displaying updates for record {{>diff diffAndUpdate.diff.source}}:{{>diff diffAndUpdate.diff.sid}}</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        {{>deps ".."}}
+    </head>
+    <body>
+        <div class="grid-x grid-padding-x grid-margin-x">
+            <div class="cell small-10 small-offset-1">
+                <p>
+                    This page summarises a recent change to a vendor record associated with an entry in the unified listing.
+                    Information that has been inserted since the last version appears in green.  Information removed since the last
+                    version appears in red.  Insertions and deletions will be announced by most screen readers.
+                </p>
+            </div>
+            <div class="cell small-10 small-offset-1">
+                {{>single-update-table diffAndUpdate}}
+            </div>
+            <div class="cell small-10 medium-5 small-offset-1">
+                <a class="button expanded large" href="../index.html">Return to overall summary.</a>
+            </div>
+            <div class="cell small-10 medium-5 small-offset-1 medium-offset-0">
+                <a class="button expanded large" href="summary.html">View all updates from this source.</a>
+            </div>
+            <div class="cell small-10 small-offset-1">
+                <p>Generated at {{dateStamp}}.</p>
+            </div>
+        </div>
+    </body>
+</html>
+

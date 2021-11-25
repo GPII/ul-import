@@ -1,0 +1,12 @@
+{
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.saiMissingRecords"
+        ]
+    },
+    "mergeConfigs": [
+        "%ul-imports/configs/curation-base.json",
+        "%ul-imports/configs/base-prod.json",
+        "%ul-imports/configs/sai-base.json"
+    ]
+}

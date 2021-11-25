@@ -1,0 +1,63 @@
+<html lang="en">
+    <head>
+        <title>All updates for the import performed at {{dateStamp}}.</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        {{>deps "."}}
+    </head>
+    <body>
+        <div class="grid-x grid-padding-x grid-margin-x">
+            <div class="cell small-10 small-offset-1">
+                <h2>All updates for the import performed at {{dateStamp}}.</h2>
+
+                <p>There are {{diffsAndUpdates.length}} records that have been updated.</p>
+            </div>
+
+            {{#if diffsAndUpdates}}
+            <div class="cell small-10 small-offset-1">
+                <table width="100%">
+                    <thead>
+                        <tr>
+                            <th width="10%">Source</th>
+                            <th width="10%">SID</th>
+                            <th>Name</th>
+                            <td class="toggle-container">
+                                <a class="button small toggle-all" href="#">Expand All</a>
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each diffsAndUpdates as |diffAndUpdate|}}
+                            <tr>
+                                <td>{{rightValue diffAndUpdate.diff.source}}</td>
+                                <td>{{rightValue diffAndUpdate.diff.sid}}</td>
+                                <td colspan="2">
+                                    <details>
+                                        <summary>
+                                            {{>diff diffAndUpdate.diff.name}}
+                                        </summary>
+
+                                        {{>single-update-table diffAndUpdate}}
+                                    </details>
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+            {{/if}}
+
+            <div class="cell small-5 small-offset-1">
+                <a class="button expanded large" href="index.html">Return to summary of updates by source.</a>
+            </div>
+
+            <div class="cell small-10 small-offset-1">
+                <p>Generated at {{dateStamp}}.</p>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            var toggler = gpii.ul.imports.toggleAllDetails("body");
+        </script>
+    </body>
+</html>
+

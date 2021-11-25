@@ -1,0 +1,10 @@
+{
+    "type": "ul.imports.images.prodConfig",
+    "options": {
+        "imageDir": "/srv/ul-images/originalsDir"
+    },
+    "mergeConfigs": [
+        "%ul-imports/configs/base-prod.json",
+        "%ul-imports/configs/image-sync-base.json"
+    ]
+}

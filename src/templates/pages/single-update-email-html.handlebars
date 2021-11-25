@@ -1,0 +1,32 @@
+<html lang="en">
+<head>
+    <title>{{subject}}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href='{{resolvePath "%fluid-diff/src/css/fluid-diff.css"}}'/>
+</head>
+<body>
+<p>Hello:</p>
+
+<p>
+    This email is to inform you of a recent change to a vendor record associated with an entry in the unified listing.
+    Information that has been inserted since the last version appears in green.  Information removed since the last
+    version appears in red.  Insertions and deletions will be announced by most screen readers.
+</p>
+
+{{>single-update-table}}
+
+{{#if diff.uid}}
+    <p>
+        <a href="https://api.ul.gpii.net/api/product/unified/{{rightValue diff.uid}}" target="_blank">View the Unified Listing API entry associated with this record.</a>
+    </p>
+{{/if}}
+
+
+<p>Regards,</p>
+<br/>
+<p>The Unified Listing Team</p>
+
+
+</body>
+</html>
+

@@ -1,0 +1,51 @@
+{
+    "type": "gpii.ul.imports.curation.baseConfig",
+    "options": {
+        "urls": {
+            "md5": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%imageDb/_design/md5/_view/byMd5",
+                        {
+                            "imageDb": "{that}.options.urls.imageDb"
+                        }
+                    ]
+                }
+            },
+            "bulkImages": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%imageDb/_bulk_docs",
+                        {
+                            "imageDb": "{that}.options.urls.imageDb"
+                        }
+                    ]
+                }
+            },
+            "mergedView": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%ulDbBaseUrl/_design/ul/_view/merged",
+                        {
+                            "ulDbBaseUrl": "{that}.options.urls.ulDb"
+                        }
+                    ]
+                }
+            },
+            "missingCreated": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%ulDbBaseUrl/_design/reports/_view/missingcreated",
+                        {
+                            "ulDbBaseUrl": "{that}.options.urls.ulDb"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

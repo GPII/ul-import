@@ -1,0 +1,83 @@
+{
+    "type": "ul.imports.eastin.baseConfig",
+    "options": {
+        "jobKey": "eastin",
+        "username": "importer",
+        "password": "password",
+        "sources": [
+            "Handicat",
+            "Vlibank",
+            "Siva",
+            "EASTIN Admin",
+            "Hjælpemiddelbasen",
+            "Rehadat",
+            "Hulpmiddelenwijzer",
+            "Oaeg",
+            "Dlf data",
+            "ATAust",
+            "AZARIM"
+        ],
+        "databases": {
+            "Handicat": {
+                "language": "es_es"
+            },
+            "Vlibank": {
+                "language": "nl_be"
+            },
+            "Siva": {
+                "language": "it_it"
+            },
+            "EASTIN Admin": {
+                "language": "en_us"
+            },
+            "Hjælpemiddelbasen": {
+                "language": "da_dk"
+            },
+            "Rehadat": {
+                "language": "de_de"
+            },
+            "Hulpmiddelenwijzer": {
+                "language": "nl_nl"
+            },
+            "Oaeg": {
+                "language": "en_us"
+            },
+            "Dlf data": {
+                "language": "en_gb"
+            },
+            "ATAust": {
+                "language": "en_au"
+            },
+            "AZARIM": {
+                "language": "he_il"
+            }
+        },
+        "isoCodes": [
+            "22.12.24",
+            "22.12.27",
+            "22.18.21",
+            "22.21.12",
+            "22.24.21",
+            "22.24.24",
+            "22.30.03",
+            "22.30.09",
+            "22.30.21",
+            "22.33.12",
+            "22.33.15",
+            "22.36.03",
+            "22.36.12",
+            "22.36.15",
+            "22.36.18",
+            "22.36.21",
+            "22.39.07",
+            "22.39.12",
+            "24.13.06"
+        ],
+        "urls": {
+            "eastin": {
+                "listSimilar": "http://webservices.eastin.eu/cloud4allwebapi/searches/products/listsimilarity",
+                "detail": "http://webservices.eastin.eu/cloud4allwebapi/searches/products/detail"
+            }
+        }
+    }
+}

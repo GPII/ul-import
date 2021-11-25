@@ -1,0 +1,6 @@
+{
+    "mergeConfigs": [
+        "%ul-imports/configs/sai-prod.json",
+        "%ul-imports/configs/sai-metadata-base.json"
+    ]
+}

@@ -1,0 +1,7 @@
+{
+    "type": "gpii.ul.imports.curation.md5.devConfig",
+    "mergeConfigs": [
+        "%ul-imports/configs/curation-orphanedImageFiles-base.json",
+        "%ul-imports/configs/base-dev.json"
+    ]
+}

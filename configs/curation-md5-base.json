@@ -1,0 +1,11 @@
+{
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.curation.md5"
+        ],
+        "originalsDir": "/opt/ul-files/originalsDir"
+    },
+    "mergeConfigs": [
+        "%ul-imports/configs/curation-base.json"
+    ]
+}

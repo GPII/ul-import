@@ -1,0 +1,7 @@
+{
+    "type": "ul.imports.gari.prodConfig",
+    "mergeConfigs": [
+        "%ul-imports/configs/base-prod.json",
+        "%ul-imports/configs/gari-base.json"
+    ]
+}

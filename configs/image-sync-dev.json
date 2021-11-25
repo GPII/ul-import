@@ -1,0 +1,10 @@
+{
+    "type": "ul.imports.images.devConfig",
+    "options": {
+        "imageDir": "/opt/ul-files/originalsDir"
+    },
+    "mergeConfigs": [
+        "%ul-imports/configs/base-dev.json",
+        "%ul-imports/configs/image-sync-base.json"
+    ]
+}

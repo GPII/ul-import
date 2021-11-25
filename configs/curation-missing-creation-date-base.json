@@ -1,0 +1,12 @@
+{
+    "options": {
+        "username": "importer",
+        "password": "password",
+        "gradeNames": [
+            "gpii.ul.imports.curation.fixMissingCreationDate"
+        ]
+    },
+    "mergeConfigs": [
+        "%ul-imports/configs/curation-base.json"
+    ]
+}

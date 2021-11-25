@@ -1,0 +1,21 @@
+{
+    "type": "ul.imports.unifier.baseConfig",
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.unifier"
+        ],
+        "username": "importer",
+        "password": "password",
+        "orphanUrl": {
+            "expander": {
+                "funcName": "fluid.stringTemplate",
+                "args": [
+                    "%baseUrl/_design/ul/_view/orphans",
+                    {
+                        "baseUrl": "{that}.options.urls.ulDb"
+                    }
+                ]
+            }
+        }
+    }
+}

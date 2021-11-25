@@ -1,0 +1,23 @@
+{
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.curation.unifiedOrphans"
+        ],
+        "urls": {
+            "unified": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%apiBaseUrl?key=%22unified%22",
+                        {
+                            "apiBaseUrl": "{that}.options.urls.ulDbSourceView"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "mergeConfigs": [
+        "%ul-imports/configs/curation-base.json"
+    ]
+}

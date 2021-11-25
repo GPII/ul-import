@@ -1,0 +1,6 @@
+{
+    "mergeConfigs": [
+        "%ul-imports/configs/curation-imageRecordsMissingFiles-base.json",
+        "%ul-imports/configs/base-dev.json"
+    ]
+}

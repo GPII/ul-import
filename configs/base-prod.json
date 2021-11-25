@@ -1,0 +1,177 @@
+{
+    "type": "ul.imports.prodConfig",
+    "options": {
+        "gradeNames": "fluid.component",
+        "outputDir": "/srv/ul-import-output/incoming",
+        "ports": {
+            "api": 4896,
+            "couch": 5984,
+            "smtp": 25
+        },
+        "hosts": {
+            "api": "ul-website",
+            "couch": "couchdb",
+            "smtp": "localhost"
+        },
+        "couchAuthCreds": "admin:admin@",
+        "urls": {
+            "api": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "http://%host:%port/api",
+                        {
+                            "host": "{that}.options.hosts.api",
+                            "port": "{that}.options.ports.api"
+                        }
+                    ]
+                }
+            },
+            "login": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%apiBaseUrl/user/login",
+                        {
+                            "apiBaseUrl": "{that}.options.urls.api"
+                        }
+                    ]
+                }
+            },
+            "merge": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%apiBaseUrl/merge",
+                        {
+                            "apiBaseUrl": "{that}.options.urls.api"
+                        }
+                    ]
+                }
+            },
+            "product": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%apiBaseUrl/product",
+                        {
+                            "apiBaseUrl": "{that}.options.urls.api"
+                        }
+                    ]
+                }
+            },
+            "products": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%apiBaseUrl/products",
+                        {
+                            "apiBaseUrl": "{that}.options.urls.api"
+                        }
+                    ]
+                }
+            },
+            "images": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%apiBaseUrl/images/%source",
+                        {
+                            "apiBaseUrl": "{that}.options.urls.api"
+                        }
+                    ]
+                }
+            },
+            "imageFiles": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%apiBaseUrl/images/file/%uid/%source/%image_id",
+                        {
+                            "apiBaseUrl": "{that}.options.urls.api"
+                        }
+                    ]
+                }
+            },
+            "couch": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "http://%authCreds%host:%port",
+                        {
+                            "authCreds": "{that}.options.couchAuthCreds",
+                            "host": "{that}.options.hosts.couch",
+                            "port": "{that}.options.ports.couch"
+                        }
+                    ]
+                }
+            },
+            "imageDb": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%couchBaseUrl/images",
+                        {
+                            "couchBaseUrl": "{that}.options.urls.couch"
+                        }
+                    ]
+                }
+            },
+            "ulDb": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%couchBaseUrl/ul",
+                        {
+                            "couchBaseUrl": "{that}.options.urls.couch"
+                        }
+                    ]
+                }
+            },
+            "ulDbUidView": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%ulDb/_design/ul/_view/records_by_uid",
+                        {
+                            "ulDb": "{that}.options.urls.ulDb"
+                        }
+                    ]
+                }
+            },
+            "ulDbSourceView": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%ulDb/_design/ul/_view/records_by_source",
+                        {
+                            "ulDb": "{that}.options.urls.ulDb"
+                        }
+                    ]
+                }
+            },
+            "ulDbBulkUpdate": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%ulDb/_bulk_docs",
+                        {
+                            "ulDb": "{that}.options.urls.ulDb"
+                        }
+                    ]
+                }
+            },
+            "ulDbAllDocs": {
+                "expander": {
+                    "funcName": "fluid.stringTemplate",
+                    "args": [
+                        "%ulDb/_all_docs",
+                        {
+                            "ulDb": "{that}.options.urls.ulDb"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

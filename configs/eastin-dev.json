@@ -1,0 +1,12 @@
+{
+    "type": "ul.imports.eastin.devConfig",
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.eastin"
+        ]
+    },
+    "mergeConfigs": [
+        "%ul-imports/configs/base-dev.json",
+        "%ul-imports/configs/eastin-base.json"
+    ]
+}

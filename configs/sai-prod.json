@@ -1,0 +1,10 @@
+{
+    "type": "ul.imports.sai.prodConfig",
+    "mergeConfigs": [
+        "%ul-imports/configs/base-prod.json",
+        "%ul-imports/configs/sai-base.json"
+    ],
+    "options": {
+        "outputDir": "/srv/ul-import-output/archived"
+    }
+}

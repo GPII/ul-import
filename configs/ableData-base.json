@@ -1,0 +1,18 @@
+{
+    "type": "ul.imports.gari.baseConfig",
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.ableData"
+        ],
+        "jobKey": "abledata",
+        "sources": [
+            "AbleData"
+        ],
+        "username": "importer",
+        "password": "password",
+        "urlTemplates": {
+            "xml": "https://abledata.acl.gov/export/tree-product-list-xml?field_indexing_term_s__tid%5B0%5D=69367&field_indexing_term_s__tid%5B1%5D=68951&field_indexing_term_s__tid%5B2%5D=65632&field_indexing_term_s__tid%5B3%5D=65635&field_indexing_term_s__tid%5B4%5D=65737&field_indexing_term_s__tid%5B5%5D=65811&field_indexing_term_s__tid%5B6%5D=63330&field_indexing_term_s__tid%5B7%5D=63359&field_indexing_term_s__tid%5B8%5D=63395&field_indexing_term_s__tid%5B9%5D=63464&field_indexing_term_s__tid%5B10%5D=63470&field_indexing_term_s__tid%5B11%5D=63482&field_indexing_term_s__tid%5B12%5D=63490&field_indexing_term_s__tid%5B13%5D=63495&field_indexing_term_s__tid%5B14%5D=63496&field_indexing_term_s__tid%5B15%5D=63601&field_indexing_term_s__tid%5B16%5D=68543&field_indexing_term_s__tid%5B17%5D=65935&field_indexing_term_s__tid%5B18%5D=67841&field_indexing_term_s__tid%5B19%5D=65961&field_indexing_term_s__tid%5B20%5D=65990&field_indexing_term_s__tid%5B21%5D=63998&field_indexing_term_s__tid%5B22%5D=63246&field_indexing_term_s__tid%5B23%5D=63277&field_indexing_term_s__tid_1%5B0%5D=68156&field_indexing_term_s__tid_1%5B1%5D=68239&field_product_status_tid=All&field_price_check_date_value_op=%3E%3D&field_price_check_date_value%5Bvalue%5D%5Bmonth%5D=1&field_price_check_date_value%5Bvalue%5D%5Bday%5D=1&field_price_check_date_value%5Bvalue%5D%5Byear%5D=%year&field_price_check_date_value%5Bmin%5D%5Bmonth%5D=&field_price_check_date_value%5Bmin%5D%5Bday%5D=&field_price_check_date_value%5Bmin%5D%5Byear%5D=&field_price_check_date_value%5Bmax%5D%5Bmonth%5D=&field_price_check_date_value%5Bmax%5D%5Bday%5D=&field_price_check_date_value%5Bmax%5D%5Byear%5D=",
+            "web": "https://abledata.acl.gov/product-export-2019-bef?field_product_status_tid=All&field_indexing_term_s__tid%5B%5D=69367&field_indexing_term_s__tid%5B%5D=68951&field_indexing_term_s__tid%5B%5D=65632&field_indexing_term_s__tid%5B%5D=65635&field_indexing_term_s__tid%5B%5D=65737&field_indexing_term_s__tid%5B%5D=65811&field_indexing_term_s__tid%5B%5D=63330&field_indexing_term_s__tid%5B%5D=63359&field_indexing_term_s__tid%5B%5D=63395&field_indexing_term_s__tid%5B%5D=63464&field_indexing_term_s__tid%5B%5D=63470&field_indexing_term_s__tid%5B%5D=63482&field_indexing_term_s__tid%5B%5D=63490&field_indexing_term_s__tid%5B%5D=63495&field_indexing_term_s__tid%5B%5D=63496&field_indexing_term_s__tid%5B%5D=63601&field_indexing_term_s__tid%5B%5D=68543&field_indexing_term_s__tid%5B%5D=65935&field_indexing_term_s__tid%5B%5D=67841&field_indexing_term_s__tid%5B%5D=65961&field_indexing_term_s__tid%5B%5D=65990&field_indexing_term_s__tid%5B%5D=63998&field_indexing_term_s__tid%5B%5D=63246&field_indexing_term_s__tid%5B%5D=63277&field_indexing_term_s__tid_1%5B%5D=68156&field_indexing_term_s__tid_1%5B%5D=68239&field_price_check_date_value_op=%3E%3D&field_price_check_date_value%5Bvalue%5D%5Bmonth%5D=1&field_price_check_date_value%5Bvalue%5D%5Bday%5D=1&field_price_check_date_value%5Bvalue%5D%5Byear%5D=2019&field_price_check_date_value%5Bmin%5D%5Bmonth%5D=&field_price_check_date_value%5Bmin%5D%5Bday%5D=&field_price_check_date_value%5Bmin%5D%5Byear%5D=&field_price_check_date_value%5Bmax%5D%5Bmonth%5D=&field_price_check_date_value%5Bmax%5D%5Bday%5D=&field_price_check_date_value%5Bmax%5D%5Byear%5D="
+        }
+    }
+}

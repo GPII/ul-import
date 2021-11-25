@@ -1,0 +1,49 @@
+<html lang="en">
+    <head>
+        <title>Updates summary.</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        {{>deps "."}}
+    </head>
+    <body>
+        <div class="grid-x grid-padding-x grid-margin-x">
+            <div class="cell small-10 small-offset-1">
+                <h2>Update Summary</h2>
+
+                <p>
+                    This page summarises changes to vendor information associated with records listed in the <a href="http://ul.gpii.net/">Unified Listing</a>.  Click a source entry below for details.
+                </p>
+
+                <p>There are {{totalRecords}} records that have been updated.</p>
+            </div>
+
+            {{#if sources}}
+            <div class="cell small-10 small-offset-1 medium-6">
+                <table>
+                    <thead>
+                        <tr><th>Source</th><th colspan="2">Updates</th></tr>
+                    </thead>
+                    <tbody>
+                        {{#each sources}}
+                            <tr>
+                                <td>{{{.}}}</td>
+                                <td>{{lookup ../recordCountBySource .}}</td>
+                                <td>
+                                    <a class="button" aria-label="View individual updates from source '{{.}}'." href="{{.}}/summary.html">View Individual Updates</a>
+                                    <a class="button" aria-label="View all records from source '{{.}}'." href="{{.}}/all-updates.html">View All Updates</a>
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+            {{/if}}
+
+            <div class="cell small-5 small-offset-1">
+                <a class="button expanded large" href="all-updates.html">View all updates as a single page.</a>
+            </div>
+
+            <div class="cell small-10 small-offset-1">Generated at {{dateStamp}}.</div>
+        </div>
+    </body>
+</html>
+

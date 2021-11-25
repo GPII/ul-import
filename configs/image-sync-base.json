@@ -1,0 +1,10 @@
+{
+    "type": "ul.imports.images.baseConfig",
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.images.core"
+        ],
+        "username": "importer",
+        "password": "password"
+    }
+}

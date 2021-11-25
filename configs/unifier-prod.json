@@ -1,0 +1,7 @@
+{
+    "type": "ul.imports.unifier.prodConfig",
+    "mergeConfigs": [
+        "%ul-imports/configs/base-prod.json",
+        "%ul-imports/configs/unifier-base.json"
+    ]
+}

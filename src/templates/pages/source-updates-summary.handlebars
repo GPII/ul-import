@@ -1,0 +1,47 @@
+<html lang="en">
+    <head>
+        <title>Update summary for source "{{source}}".</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        {{>deps ".."}}
+    </head>
+    <body>
+        <div class="grid-x grid-padding-x grid-margin-x">
+            <div class="cell small-10 small-offset-1">
+                <h2>Update Summary for Source "{{source}}"</h2>
+
+                <p>
+                    This page summarises changes to vendor information provided by the source "{{source}}". Click an individual record below for details.
+                </p>
+
+                <p>There are {{diffsAndUpdates.length}} records that have been updated.</p>
+            </div>
+
+            {{#if diffsAndUpdates}}
+            <div class="cell small-10 small-offset-1">
+                <table>
+                    <thead>
+                        <tr><th>SID</th><th>Name</th></tr>
+                    </thead>
+                    <tbody>
+                        {{#each diffsAndUpdates as |diffAndUpdate|}}
+                            <tr>
+                                <td>{{rightValue diffAndUpdate.diff.sid}}</td>
+                                <td><a href="{{../source}}-{{sanitizeFilename diffAndUpdate.diff.sid.0.value}}.html">{{rightValue diffAndUpdate.diff.name}}</a></td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+            {{/if}}
+
+            <div class="cell small-5 small-offset-1">
+                <a class="button expanded large" href="../index.html">Return to overall summary.</a>
+            </div>
+
+            <div class="cell small-10 small-offset-1">
+                <p>Generated at {{dateStamp}}.</p>
+            </div>
+        </div>
+    </body>
+</html>
+

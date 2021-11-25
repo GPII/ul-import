@@ -1,0 +1,8 @@
+{
+    "options": {
+        "gradeNames": "gpii.ul.imports.diffImportResults"
+    },
+    "mergeConfigs": [
+        "%ul-imports/configs/updates-base.json"
+    ]
+}

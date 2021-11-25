@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <title>AbleData Static Sandbox - Full Text Search</title>
+        <script src="./js/infusion-all.js"></script>
+        <script src="./js/fuse.js"></script>
+        <script src="./js/abledata-data.js"></script>
+        <script src="./js/static-search.js"></script>
+        <script src="./js/helper.js"></script>
+        <script src="./js/equals.js"></script>
+        <script src="./js/jsonify.js"></script>
+        <script src="./js/markdown-it.js"></script>
+        <script src="./js/handlebars.js"></script>
+        <script src="./js/md-common.js"></script>
+        <script src="./js/md-client.js"></script>
+        <script src="./js/renderer.js"></script>
+        <link type="text/css" rel="stylesheet" href="css/foundation.css"></link>
+    </head>
+    <body>
+        <div class="search-container grid-x grid-padding-x grid-margin-x">
+            <div class="cell small-2 small-offset-1">
+                Search Static AbleData:
+            </div>
+            <div class="cell small-9">
+                <input class="search-input">
+                <button class="search-submit">Go!</button>
+            </div>
+            <div class="cell small-12">
+                <hr/>
+            </div>
+            <div class="cell small-10 small-offset-1">
+                <div class="search-results"></div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            var searchComponent = gpii.ul.imports.ableData.search(".search-container");
+        </script>
+    </body>
+</html>

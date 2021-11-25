@@ -1,0 +1,7 @@
+{
+    "type": "gpii.ul.imports.curation.sourceUrls.prodConfig",
+    "mergeConfigs": [
+        "%ul-imports/configs/curation-check-source-urls-base.json",
+        "%ul-imports/configs/base-prod.json"
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.curation.strayImages"
+        ]
+    },
+    "mergeConfigs": [
+        "%ul-imports/configs/curation-base.json"
+    ]
+}

@@ -1,0 +1,7 @@
+{
+    "type": "ul.imports.ableData.devConfig",
+    "mergeConfigs": [
+        "%ul-imports/configs/base-dev.json",
+        "%ul-imports/configs/ableData-base.json"
+    ]
+}

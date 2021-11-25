@@ -1,0 +1,7 @@
+{
+    "type": "ul.imports.ableData.prodConfig",
+    "mergeConfigs": [
+        "%ul-imports/configs/base-prod.json",
+        "%ul-imports/configs/ableData-base.json"
+    ]
+}

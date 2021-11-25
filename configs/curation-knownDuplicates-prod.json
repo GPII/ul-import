@@ -1,0 +1,6 @@
+{
+    "mergeConfigs": [
+        "%ul-imports/configs/curation-knownDuplicates-base.json",
+        "%ul-imports/configs/base-prod.json"
+    ]
+}

@@ -1,0 +1,34 @@
+Hello:
+
+This email is to inform you of a recent change to a vendor record associated with an entry in the unified listing.
+Information that was added since the last version is surrounded with plus signs (+).  Information removed since the last
+version is surrounded with minus signs (-).
+
+Source:     {{>diff-text diff.source}}
+SID:        {{>diff-text diff.sid}}
+{{#if diff.sourceUrl}}
+Source URL: {{>diff-text diff.sourceUrl}}
+{{/if}}
+Name:       {{>diff-text diff.name}}
+
+Description:
+
+{{>diff-text diff.description}}
+
+Manufacturer:
+
+{{>manufacturer-diff-text diff.manufacturer}}
+
+Status:     {{>diff-text diff.status}}
+
+{{#if diff.uid}}
+The Unified Listing API entry associated with this record can be found at:
+
+https://api.ul.gpii.net/api/product/unified/{{rightValue diff.uid}}
+{{/if}}
+
+
+Regards,
+
+
+The Unified Listing Team

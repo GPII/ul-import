@@ -1,0 +1,14 @@
+{
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.saiChecker"
+        ],
+        "urls": {
+            "saiUidApi": "https://ul.gpii.net/uid/"
+        }
+    },
+    "mergeConfigs": [
+        "%ul-imports/configs/curation-base.json",
+        "%ul-imports/configs/base-prod.json"
+    ]
+}

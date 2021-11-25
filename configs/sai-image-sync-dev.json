@@ -1,0 +1,7 @@
+{
+    "type": "ul.imports.images.sai.devConfig",
+    "mergeConfigs": [
+        "%ul-imports/configs/image-sync-dev.json",
+        "%ul-imports/configs/sai-image-sync-base.json"
+    ]
+}

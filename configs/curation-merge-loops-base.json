@@ -1,0 +1,12 @@
+{
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.curation.mergeLoops"
+        ],
+        "username": "importer",
+        "password": "password"
+    },
+    "mergeConfigs": [
+        "%ul-imports/configs/curation-base.json"
+    ]
+}

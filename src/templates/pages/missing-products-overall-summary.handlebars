@@ -1,0 +1,17 @@
+<html>
+    <title>Summary Report, All Sources</title>
+    <body>
+        <h1>Summary Report, All Sources</h1>
+
+        <p>This report summarises all records found in the SAI/UL API that are missing from each of our "source" database vendors.</p>
+
+        {{#each .}}
+            <h2>{{@key}}</h2>
+            <ul>
+                {{#each . }}
+                    <li>{{@key}}: {{.}}</li>
+                {{/each}}
+            </ul>
+        {{/each}}
+    </body>
+</html>

@@ -1,0 +1,8 @@
+{
+    "type": "ul.imports.images.sai.baseConfig",
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.sai.deletes"
+        ]
+    }
+}

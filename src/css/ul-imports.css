@@ -1,0 +1,29 @@
+table {
+    border: 2px solid #cccccc;
+    border-radius: 1em;
+    padding: 2em;
+}
+
+td, th {
+    padding: .5em;
+    vertical-align: text-top;
+    align: left;
+}
+
+tr {
+    margin-top: .5em;
+}
+
+th {
+    font-size: 1.1em;
+    white-space: nowrap;
+}
+
+caption {
+    display:none
+}
+
+.toggle-container {
+    text-align: right;
+    vertical-align: middle;
+}

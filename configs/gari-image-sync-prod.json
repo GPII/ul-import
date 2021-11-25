@@ -1,0 +1,7 @@
+{
+    "type": "ul.imports.images.gari.prodConfig",
+    "mergeConfigs": [
+        "%ul-imports/configs/image-sync-prod.json",
+        "%ul-imports/configs/gari-image-sync-base.json"
+    ]
+}

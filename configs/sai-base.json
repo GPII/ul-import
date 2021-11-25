@@ -1,0 +1,20 @@
+{
+    "type": "ul.imports.sai.baseConfig",
+    "options": {
+        "gradeNames": [
+            "gpii.ul.imports.sai"
+        ],
+        "sources": [
+            "sai"
+        ],
+        "jobKey": "sai",
+        "username": "importer",
+        "password": "password",
+        "urls": {
+            "sai": {
+                "records": "https://ul.gpii.net/api/v1/products/all",
+                "deletes": "https://ul.gpii.net/api/v1/deleted"
+            }
+        }
+    }
+}
