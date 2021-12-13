@@ -24,6 +24,7 @@ require("../launcher");
 require("../concurrent-promise-queue");
 require("../login");
 require("../transforms");
+require("./distinct-iso-codes");
 
 fluid.popLogging();
 
@@ -80,27 +81,21 @@ gpii.ul.imports.eastin.metadata.processRecordLookupResults = function (that, res
             });
 
 
-            var primaryIsoCodes = [];
-            var optionalIsoCodes = {};
-            // TODO: Go through all EASTIN entries and pick out the unique ISO codes (primary and optional)
+            var allIsoCodes = [];
+            // Go through all EASTIN entries and pick out the unique ISO codes (primary and optional)
             fluid.each(eastinRecords, function (eastinRecord) {
                 if (fluid.get(eastinRecord, "isoCodes.length")) {
-                    primaryIsoCodes.push(eastinRecord.isoCodes[0]);
-                    fluid.each(eastinRecord.isoCodes.slice(1), function (isoCode) {
-                        optionalIsoCodes[isoCode.Code] = isoCode;
-                    });
+                    allIsoCodes = allIsoCodes.concat(eastinRecord.isoCodes);
                 }
             });
-            if (primaryIsoCodes.length) {
-                // Consolidate all primary and optional codes.
-                var combinedIsoCodes = [];
-                combinedIsoCodes.push(primaryIsoCodes[0]);
-                combinedIsoCodes = combinedIsoCodes.concat(Object.values(optionalIsoCodes));
+
+            if (allIsoCodes.length) {
+                var filteredIsoCodes = gpii.ul.imports.eastin.distinctIsoCodes(allIsoCodes);
 
                 // Compare to the existing record and update if needed.
-                if (!fluid.diff.equals(combinedIsoCodes, unifiedRecord.isoCodes)) {
+                if (!fluid.diff.equals(filteredIsoCodes, unifiedRecord.isoCodes)) {
                     var recordToUpdate = fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true);
-                    recordToUpdate.isoCodes = combinedIsoCodes;
+                    recordToUpdate.isoCodes = filteredIsoCodes;
                     recordsToUpdate.push(recordToUpdate);
                 }
             }
