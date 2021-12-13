@@ -1,0 +1,6 @@
+{
+    "mergeConfigs": [
+        "%ul-imports/configs/eastin-prod.json",
+        "%ul-imports/configs/eastin-metadata-base.json"
+    ]
+}

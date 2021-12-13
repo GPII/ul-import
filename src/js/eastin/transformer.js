@@ -55,6 +55,30 @@ gpii.ul.imports.eastin.transformer.standardizeDate = function (originalDateStrin
     return new Date(originalDateString).toISOString();
 };
 
+gpii.ul.imports.eastin.transformer.consolidateIsoCodes = function (inputs) {
+    var combinedIsoCodes = [];
+
+    var isoCodePrimary = inputs.primary();
+    if (isoCodePrimary) {
+        combinedIsoCodes.push(isoCodePrimary);
+    }
+
+    var isoCodesOptional = inputs.optional();
+    if (isoCodesOptional && isoCodesOptional.length) {
+        combinedIsoCodes = combinedIsoCodes.concat(isoCodesOptional);
+    }
+
+    return combinedIsoCodes;
+};
+
+fluid.defaults("gpii.ul.imports.eastin.transformer.consolidateIsoCodes", {
+    gradeNames: [ "fluid.multiInputTransformFunction", "fluid.standardOutputTransformFunction" ],
+    inputVariables: {
+        primary: null,
+        optional: null
+    }
+});
+
 fluid.defaults("gpii.ul.imports.eastin.transformer", {
     gradeNames: ["fluid.modelComponent"],
     defaultValues: {
@@ -188,6 +212,13 @@ fluid.defaults("gpii.ul.imports.eastin.transformer", {
             transform: {
                 type: "gpii.ul.imports.eastin.transformer.standardizeDate",
                 inputPath: "LastUpdateDate"
+            }
+        },
+        isoCodes: {
+            transform: {
+                type: "gpii.ul.imports.eastin.transformer.consolidateIsoCodes",
+                primaryPath: "IsoCodePrimary",
+                optionalPath: "IsoCodesOptional"
             }
         },
         sourceData: ""

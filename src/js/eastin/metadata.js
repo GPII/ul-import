@@ -27,14 +27,16 @@ require("../transforms");
 
 fluid.popLogging();
 
-fluid.registerNamespace("gpii.ul.imports.sai.metadata");
+fluid.registerNamespace("gpii.ul.imports.eastin.metadata");
 
-gpii.ul.imports.sai.metadata.retrieveRecords = function (that) {
+gpii.ul.imports.eastin.metadata.retrieveRecords = function (that) {
     gpii.ul.imports.login(that).then(
         function () {
+            var sourceQuery = "[%22" + that.options.sources.join("%22,%22") + "%22]";
+            var sourceRecordsUrl = that.options.urls.products + "?sources=" + sourceQuery + "&limit=1000000&status=[%22new%22,%22active%22,%22discontinued%22]&unified=true";
             var lookupOptions = {
                 jar: true,
-                url: that.options.urls.products + "?sources=%22sai%22&limit=1000000&status=[%22deleted%22,%22new%22,%22active%22,%22discontinued%22]",
+                url: sourceRecordsUrl,
                 headers: {
                     "Accept": "application/json"
                 }
@@ -56,91 +58,67 @@ gpii.ul.imports.sai.metadata.retrieveRecords = function (that) {
     );
 };
 
-gpii.ul.imports.sai.metadata.processRecordLookupResults = function (that, results) {
+gpii.ul.imports.eastin.metadata.processRecordLookupResults = function (that, results) {
     var recordsToUpdate = [];
-    fluid.log(fluid.logLevel.IMPORTANT, "Comparing " + results.products.length + " SAI records to their associated unified records.");
+    fluid.log(fluid.logLevel.IMPORTANT, "Comparing " + results.products.length + " EASTIN records to their associated unified records.");
     fluid.each(results.products, function (unifiedRecord) {
-        var saiRecords = [];
-        var saiRecordsByStatus = { deleted: [], notDeleted: []};
-        // if (unifiedRecord.sources) {
-        //     fluid.log(fluid.logLevel.IMPORTANT, "Examining " + unifiedRecord.sources.length + " source record(s) for unified record '" + unifiedRecord.uid + "'.");
-        // }
-        // else {
-        //     fluid.log(fluid.logLevel.IMPORTANT, "No sources for unified record '" + unifiedRecord.uid + "'.");
-        // }
+        var eastinRecords = [];
 
         fluid.each(unifiedRecord.sources, function (sourceRecord) {
-            if (sourceRecord.source === "sai") {
-                saiRecords.push(sourceRecord);
-                var pseudoStatus = sourceRecord.status === "deleted" ? "deleted" : "notDeleted";
-                saiRecordsByStatus[pseudoStatus].push(sourceRecord);
+            if (that.options.sources.indexOf(sourceRecord.source) !== -1) {
+                eastinRecords.push(sourceRecord);
             }
         });
 
-        var filteredUnifiedRecord = fluid.filterKeys(unifiedRecord, that.options.fieldsToDiff);
-        var saiRecord = false;
-
-        if (saiRecords.length === 0) {
-            fluid.log(fluid.logLevel.INFO, "No SAI source record(s) found for unified record '" + unifiedRecord.uid + "', something is wrong.");
+        if (eastinRecords.length === 0) {
+            fluid.log(fluid.logLevel.INFO, "No EASTIN source record(s) found for unified record '" + unifiedRecord.uid + "'.");
         }
-        else if (saiRecords.length === 1) {
-            saiRecord = saiRecords[0];
-        }
-        else if (saiRecords.length > 1) {
-            // TODO: Add diff checks to avoid reprocessing records.
-            var nonDeletedSaiRecordCount = fluid.get(saiRecordsByStatus, "notDeleted.length") || 0;
-            var deletedSaiRecordCount = fluid.get(saiRecordsByStatus, "deleted.length") || 0;
-            // If all the records have been deleted and the record hasn't, just update the status.
-            if ( deletedSaiRecordCount === saiRecords.length) {
-                if (unifiedRecord.status === "deleted") {
-                    fluid.log(fluid.logLevel.INFO, "Unified record" + unifiedRecord.uid + " has already been flagged as deleted based on SAI metadata.");
-                }
-                else {
-                    fluid.log(fluid.logLevel.INFO, "Unified record '" + unifiedRecord.uid + "' has more than one SAI record, but all have been deleted.  Flagging the record as deleted.");
+        else {
+            // Sort in reverse order by date, newest first
+            eastinRecords.sort(function (a, b) {
+                return a.updated > b.updated ? -1 : 1;
+            });
 
-                    var recordToDelete = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), { status: "deleted" });
-                    recordToDelete.updated = (new Date()).toISOString();
-                    recordsToUpdate.push(recordToDelete);
-                }
-            }
-            // If there are multiple records but only one has not been deleted, use that one.
-            else {
-                if (nonDeletedSaiRecordCount === 1) {
-                    fluid.log(fluid.logLevel.INFO, "Unified record '" + unifiedRecord.uid + "' has more than one non-deleted SAI record, but only one has not been deleted.  Using that metadata.");
-                    saiRecord = saiRecordsByStatus.notDeleted[0];
-                }
-                else {
-                    fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' has " + deletedSaiRecordCount + " deleted and " + nonDeletedSaiRecordCount + " non-deleted SAI records.  Can't update the unified record.");
-                }
-            }
-        }
 
-        if (saiRecord) {
-            var filteredSaiRecord = fluid.filterKeys(saiRecord, that.options.fieldsToDiff);
-            if (!fluid.diff.equals(filteredSaiRecord, filteredUnifiedRecord)) {
-                fluid.log(fluid.logLevel.IMPORTANT, "Unified record '" + unifiedRecord.uid + "' needs to be updated with metadata from the SAI.");
-                var updatedRecord = fluid.merge({}, fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true), filteredSaiRecord);
-                updatedRecord.updated = (new Date()).toISOString();
-                recordsToUpdate.push(updatedRecord);
-            }
-            else {
-                fluid.log(fluid.logLevel.INFO, "Unified record '" + unifiedRecord.uid + "' is up to date with the SAI metadata.");
+            var primaryIsoCodes = [];
+            var optionalIsoCodes = {};
+            // TODO: Go through all EASTIN entries and pick out the unique ISO codes (primary and optional)
+            fluid.each(eastinRecords, function (eastinRecord) {
+                if (fluid.get(eastinRecord, "isoCodes.length")) {
+                    primaryIsoCodes.push(eastinRecord.isoCodes[0]);
+                    fluid.each(eastinRecord.isoCodes.slice(1), function (isoCode) {
+                        optionalIsoCodes[isoCode.Code] = isoCode;
+                    });
+                }
+            });
+            if (primaryIsoCodes.length) {
+                // Consolidate all primary and optional codes.
+                var combinedIsoCodes = [];
+                combinedIsoCodes.push(primaryIsoCodes[0]);
+                combinedIsoCodes = combinedIsoCodes.concat(Object.values(optionalIsoCodes));
+
+                // Compare to the existing record and update if needed.
+                if (!fluid.diff.equals(combinedIsoCodes, unifiedRecord.isoCodes)) {
+                    var recordToUpdate = fluid.filterKeys(unifiedRecord, that.options.keysToStrip, true);
+                    recordToUpdate.isoCodes = combinedIsoCodes;
+                    recordsToUpdate.push(recordToUpdate);
+                }
             }
         }
     });
 
     if (recordsToUpdate.length === 0) {
-        fluid.log(fluid.logLevel.IMPORTANT, "All unified records are up to date with SAI metadata.");
+        fluid.log(fluid.logLevel.IMPORTANT, "All unified records are up to date with EASTIN ISO data.");
     }
     else if (that.options.commit) {
-        gpii.ul.imports.sai.metadata.updateRecords(that, recordsToUpdate);
+        gpii.ul.imports.eastin.metadata.updateRecords(that, recordsToUpdate);
     }
     else {
-        fluid.log(fluid.logLevel.IMPORTANT, "Found " + recordsToUpdate.length + " unified records whose metadata needs to be updated, run with --commit to update...");
+        fluid.log(fluid.logLevel.IMPORTANT, "Found " + recordsToUpdate.length + " unified records whose ISO data needs to be updated, run with --commit to update...");
     }
 };
 
-gpii.ul.imports.sai.metadata.updateRecords = function (that, recordsToUpdate) {
+gpii.ul.imports.eastin.metadata.updateRecords = function (that, recordsToUpdate) {
 
     var promises = fluid.transform(recordsToUpdate, function (record) {
         return function () {
@@ -202,28 +180,27 @@ gpii.ul.imports.sai.metadata.updateRecords = function (that, recordsToUpdate) {
     );
 };
 
-fluid.defaults("gpii.ul.imports.sai.metadata", {
+fluid.defaults("gpii.ul.imports.eastin.metadata", {
     gradeNames: ["fluid.component"],
     keysToStrip: ["sources"],
-    fieldsToDiff: ["name", "description", "status", "manufacturer"],
     maxRequests: 10,
     invokers: {
         "processRecordLookupResults": {
-            funcName: "gpii.ul.imports.sai.metadata.processRecordLookupResults",
+            funcName: "gpii.ul.imports.eastin.metadata.processRecordLookupResults",
             args: ["{that}", "{arguments}.0"] // results
         }
     },
     listeners: {
         "onCreate.retrieveRecords": {
-            funcName: "gpii.ul.imports.sai.metadata.retrieveRecords",
+            funcName: "gpii.ul.imports.eastin.metadata.retrieveRecords",
             args:     ["{that}"]
         }
     }
 });
 
-fluid.defaults("gpii.ul.imports.sai.metadata.launcher", {
+fluid.defaults("gpii.ul.imports.eastin.metadata.launcher", {
     gradeNames:  ["gpii.ul.imports.launcher"],
-    optionsFile: "%ul-imports/configs/sai-metadata-prod.json",
+    optionsFile: "%ul-imports/configs/eastin-metadata-prod.json",
     "yargsOptions": {
         "describe": {
             "username":         "The username to use when writing records to the UL.",
@@ -233,4 +210,4 @@ fluid.defaults("gpii.ul.imports.sai.metadata.launcher", {
     }
 });
 
-gpii.ul.imports.sai.metadata.launcher();
+gpii.ul.imports.eastin.metadata.launcher();

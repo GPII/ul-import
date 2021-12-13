@@ -2,7 +2,8 @@
 #
 # Expects to be able to reach a container with the alias "couchdb", such as we use from the ul-website project.
 
-FROM node:8.12.0-alpine
+FROM node:16.10.0-alpine3.14
+
 
 # Store a copy of our code in a TLD in the container.
 WORKDIR /ul-imports
@@ -13,7 +14,7 @@ ENV NODE_ENV production
 
 # Install our dependencies
 RUN apk update && \
-    apk add --no-cache --virtual build-dependencies python make git g++ && \
+    apk add --no-cache --virtual build-dependencies make git g++ && \
     rm -rf node_modules/* && \
     npm install && \
     npm cache clean --force && \
